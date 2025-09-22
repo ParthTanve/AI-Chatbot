@@ -13,7 +13,7 @@ from functions import (
 from API import GENAI_API_KEY
 import os
 
-# --- Configure Google Gemini ---
+# --- Configure Google Gemini --
 genai.configure(api_key=GENAI_API_KEY)
 model = genai.GenerativeModel("gemini-1.5-flash")
 
@@ -118,3 +118,4 @@ for msg in msgs.messages:
             unsafe_allow_html=True
         )
         speak_text(msg.content)
+
