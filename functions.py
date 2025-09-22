@@ -13,6 +13,7 @@ import docx
 from langchain.memory import StreamlitChatMessageHistory
 import google.generativeai as genai
 import streamlit as st
+import pyaudio
 
 def speak_text(text):
     try:
@@ -125,4 +126,5 @@ def ask_gemini(prompt, model, image=None, chat_history=None, retries=3):
                 time.sleep(2**(i+1))
             else:
                 return f"API Error: {e}"
+
     return "Failed to get a response after multiple retries."
