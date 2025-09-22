@@ -9,7 +9,8 @@ python-pptx
 python-docx
 SpeechRecognition
 gTTS
-pyaudio
+
+
 
 
 
