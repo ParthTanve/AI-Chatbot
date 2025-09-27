@@ -18,17 +18,17 @@ import streamlit as st
 def speak_text(text):
     """Generates and plays audio from text using gTTS."""
     try:
-        # gTTS generates an MP3 file
+        
         tts = gTTS(text=text, lang="en")
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
             tts.save(fp.name)
             audio_path = fp.name
         
-        # Streamlit plays the temporary audio file
+        
         st.audio(audio_path, format="audio/mp3")
-        os.remove(audio_path) # Clean up the temporary file
+        os.remove(audio_path) 
     except Exception as e:
-        # Ignore errors during development if gTTS fails on a specific system/word
+    
         pass 
 
 
@@ -42,25 +42,25 @@ def speech_to_text_from_mic(audio_bytes):
     Returns:
         str: Recognized text or an error message.
     """
-    # CRITICAL CHECK: Ensure a bytes object was received from the Streamlit component
+    
     if not audio_bytes or not isinstance(audio_bytes, bytes):
         return "Speech-to-Text Error: No valid audio data received."
     
     try:
         recognizer = sr.Recognizer()
         
-        # 1. Save the audio bytes to a temporary WAV file
+        
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as fp:
             fp.write(audio_bytes)
             audio_path = fp.name
         
-        # 2. Process the temporary file with SpeechRecognition
-        # sr.AudioFile expects a file path
+        
+        
         with sr.AudioFile(audio_path) as source:
             audio = recognizer.record(source)
             text = recognizer.recognize_google(audio)
             
-        os.remove(audio_path) # 3. Clean up the temporary file
+        os.remove(audio_path) 
         return text
     
     except sr.UnknownValueError:
@@ -121,8 +121,7 @@ def handle_command(user_input):
                 return f"Opening {key.replace('open ', '')}..."
 
         if "notepad" in user_input:
-            # os.startfile is for Windows/Desktop use only
-            # Will not work on Streamlit Cloud, but left for local testing
+           
             os.startfile("notepad.exe") 
             return "Opening Notepad..."
 
@@ -140,7 +139,7 @@ def handle_command(user_input):
 def ask_gemini(prompt, model, image=None, chat_history=None, retries=3):
     """Handles interaction with the Gemini API, including chat history and image input."""
     full_prompt = ""
-    # Format Langchain history into a simple string prompt for Gemini
+    
     if chat_history:
         for msg in chat_history:
             if hasattr(msg, 'type') and hasattr(msg, 'content'):
