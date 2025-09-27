@@ -16,7 +16,7 @@ from streamlit_mic_recorder import mic_recorder
 
 
 genai.configure(api_key=GENAI_API_KEY)
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 
 st.set_page_config(page_title="AI Chatbot", layout="wide")
@@ -159,3 +159,4 @@ for msg in msgs.messages:
         
 
         speak_text(msg.content)
+
