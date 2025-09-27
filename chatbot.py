@@ -5,20 +5,20 @@ from langchain.memory import ConversationBufferMemory
 from PIL import Image
 from functions import (
     speak_text,
-    speech_to_text_from_mic, # Now takes raw audio bytes
+    speech_to_text_from_mic, 
     extract_text_from_file,
     handle_command,
     ask_gemini
 )
 from API import GENAI_API_KEY
 import os
-from streamlit_mic_recorder import mic_recorder # NEW: Component for browser mic access
+from streamlit_mic_recorder import mic_recorder 
 
 
 genai.configure(api_key=GENAI_API_KEY)
 model = genai.GenerativeModel("gemini-1.5-flash")
 
-# --- Streamlit Setup ---
+
 st.set_page_config(page_title="AI Chatbot", layout="wide")
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
@@ -26,7 +26,7 @@ with col2:
 
 st.title("Bruno Chatbot")
 
-# --- Chat History Management ---
+
 msgs = StreamlitChatMessageHistory(key="chat_messages")
 if len(msgs.messages) == 0:
     msgs.add_ai_message("How can I help you?")
@@ -38,7 +38,7 @@ memory = ConversationBufferMemory(
     return_messages=True
 )
 
-# --- Sidebar and Input Initialization ---
+
 menu = st.sidebar.radio("Navigation", ["Chat", "Voice", "File", "Image Upload"])
 
 user_input = None
@@ -47,7 +47,7 @@ image_question = None
 uploaded_image = None
 uploaded_file = None
 
-# --- Input Handling based on Menu Selection ---
+
 if menu == "Chat":
     user_input = st.text_input("Type your message here...")
 
@@ -55,29 +55,29 @@ if menu == "Chat":
 elif menu == "Voice":
     st.write("Click 'Record' to start, and 'Stop' when finished. The audio will then be processed.")
     
-    # Use the browser-based mic recorder component
+    
     audio_data_dict = mic_recorder(
         start_prompt="Record", 
         stop_prompt="Stop",
         key='mic_recorder',
-        format="wav" # Best format for SpeechRecognition
+        format="wav" 
     )
 
     if audio_data_dict:
-        # Check if the audio data has changed (user finished recording)
+        
         if 'last_audio_data' not in st.session_state or st.session_state.get('last_audio_data') != audio_data_dict:
             st.session_state['last_audio_data'] = audio_data_dict
             
-            # CRITICAL FIX: Extract the raw bytes from the dictionary output
+            
             audio_bytes = audio_data_dict.get('bytes') 
             
             with st.spinner("Processing speech..."):
-                # Pass the raw audio bytes (bytes-like object) to the function
+                
                 recognized_text = speech_to_text_from_mic(audio_bytes) 
             
             st.success(f"Recognized Speech: {recognized_text}")
             
-            # Store recognized text and trigger a rerun to process it as a chat message
+            
             st.session_state['voice_input'] = recognized_text
             st.rerun()
 
@@ -107,15 +107,15 @@ elif menu == "Image Upload":
             user_input = image_question
 
 
-# --- Retrieve Voice Input (if a rerun was triggered by the voice block) ---
+
 if 'voice_input' in st.session_state and st.session_state['voice_input']:
     user_input = st.session_state.pop('voice_input')
 
 
-# --- Main Chat Processing Logic ---
+
 if user_input or image_input:
     
-    # 1. Handle Image Upload submission separately
+    
     if menu == "Image Upload" and uploaded_image and image_question:
         msgs.add_user_message(image_question)
         with st.spinner("Generating response..."):
@@ -127,15 +127,15 @@ if user_input or image_input:
             )
         msgs.add_ai_message(bot_reply)
     
-    # 2. Handle Chat/Voice/File input
+    
     else:
         command_response = handle_command(user_input if user_input else "")
 
         if command_response:
-            # Handle hardcoded command
+            
             msgs.add_ai_message(command_response)
         else:
-            # Send to Gemini
+            
             msgs.add_user_message(user_input if user_input else "Sent an Image")
             with st.spinner("Thinking..."):
                 bot_reply = ask_gemini(
@@ -147,7 +147,7 @@ if user_input or image_input:
             msgs.add_ai_message(bot_reply)
 
 
-# --- Display Chat History ---
+
 for msg in msgs.messages:
     if msg.type == "human":
         st.markdown(f"**You:** {msg.content}")
@@ -156,5 +156,6 @@ for msg in msgs.messages:
             f'**<span style="color: #4CAF50;">Bruno:</span>** {msg.content}',
             unsafe_allow_html=True
         )
-        # Text-to-Speech output
+        
+
         speak_text(msg.content)
