@@ -1,7 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
 from langchain_community.chat_message_histories import StreamlitChatMessageHistory
-from langchain.memory import ConversationBufferMemory
+from langchain.memory 
 from PIL import Image
 from functions import (
     speak_text,
@@ -159,4 +159,5 @@ for msg in msgs.messages:
         
 
         speak_text(msg.content)
+
 
